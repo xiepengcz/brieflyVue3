@@ -1,0 +1,52 @@
+{
+  "0 debug pnpm:scope": {
+    "selected": 1
+  },
+  "1 debug pnpm:package-manifest": {
+    "initial": {
+      "name": "brieflyVue3",
+      "version": "1.0.0",
+      "description": "",
+      "main": "index.js",
+      "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+      },
+      "keywords": [],
+      "author": "",
+      "license": "ISC"
+    },
+    "prefix": "/Users/xiepeng/Documents/practice/brieflyVue3"
+  },
+  "2 debug pnpm:context": {
+    "currentLockfileExists": false,
+    "storeDir": "/Users/xiepeng/Library/pnpm/store/v3",
+    "virtualStoreDir": "/Users/xiepeng/Documents/practice/brieflyVue3/node_modules/.pnpm"
+  },
+  "3 debug pnpm:stage": {
+    "prefix": "/Users/xiepeng/Documents/practice/brieflyVue3",
+    "stage": "resolution_started"
+  },
+  "4 error pnpm": {
+    "code": "ERR_PNPM_FETCH_404",
+    "hint": "@type/jest is not in the npm registry, or you have no permission to fetch it.\n\nNo authorization header was set for the request.",
+    "request": {
+      "url": "https://registry.npmjs.org/@type%2Fjest"
+    },
+    "response": {
+      "size": 0
+    },
+    "pkgName": "@type/jest",
+    "spec": {
+      "fetchSpec": "latest",
+      "name": "@type/jest",
+      "type": "tag"
+    },
+    "pkgsStack": [],
+    "err": {
+      "name": "pnpm",
+      "message": "GET https://registry.npmjs.org/@type%2Fjest: Not Found - 404",
+      "code": "ERR_PNPM_FETCH_404",
+      "stack": "pnpm: GET https://registry.npmjs.org/@type%2Fjest: Not Found - 404\n    at RetryOperation._fn (/snapshot/dist/pnpm.cjs)\n    at processTicksAndRejections (internal/process/task_queues.js:95:5)"
+    }
+  }
+}
