@@ -5,7 +5,7 @@ class ReactiveEffect {
   }
   run() {
     activeEffect = this;
-    this._fn();
+    return this._fn();
   }
 }
 
@@ -39,7 +39,8 @@ export function trigger(target, key) {
 let activeEffect;
 export function effect(fn) {
   // fn依赖收集
-  // fn
   const _effect = new ReactiveEffect(fn);
   _effect.run();
+
+  return _effect.run.bind(_effect); // 这里存在this指向 使用bind修改this指向
 }
