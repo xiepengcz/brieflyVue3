@@ -1,3 +1,5 @@
+import { extend } from "../shared";
+
 class ReactiveEffect {
   private _fn: any;
   deps = [];
@@ -49,7 +51,6 @@ export function track(target, key) {
 export function trigger(target, key) {
   // 取出dep，遍历 fn
   let depsMap = targetMap.get(target);
-  if (!depsMap) return;
   let dep = depsMap.get(key);
   for (const effect of dep) {
     if (effect.scheduler) {
@@ -64,11 +65,12 @@ let activeEffect;
 export function effect(fn, options: any = {}) {
   // fn依赖收集
   const _effect = new ReactiveEffect(fn, options.scheduler);
-  _effect.onStop = options.onStop;
+
+  extend(_effect, options);
   _effect.run();
   const runner: any = _effect.run.bind(_effect); // 这里存在this指向 使用bind修改this指向
   runner.effect = _effect;
-  return runner; 
+  return runner;
 }
 
 export function stop(runner) {
