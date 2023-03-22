@@ -1,5 +1,8 @@
 class ReactiveEffect {
   private _fn: any;
+  deps = [];
+  active = true;
+  onStop?: () => void;
   constructor(fn, public scheduler?) {
     this._fn = fn;
   }
@@ -7,6 +10,20 @@ class ReactiveEffect {
     activeEffect = this;
     return this._fn();
   }
+  stop() {
+    if (this.active) {
+      cleanupEffect(this);
+      if (this.onStop) {
+        this.onStop();
+      }
+      this.active = false;
+    }
+  }
+}
+function cleanupEffect(effect) {
+  effect.deps.forEach((dep: any) => {
+    dep.delete(effect);
+  });
 }
 
 const targetMap = new Map();
@@ -24,12 +41,15 @@ export function track(target, key) {
     dep = new Set();
     depsMap.set(key, dep);
   }
+  if (!activeEffect) return;
   dep.add(activeEffect);
+  activeEffect.deps.push(dep);
 }
 
 export function trigger(target, key) {
   // 取出dep，遍历 fn
   let depsMap = targetMap.get(target);
+  if (!depsMap) return;
   let dep = depsMap.get(key);
   for (const effect of dep) {
     if (effect.scheduler) {
@@ -44,7 +64,13 @@ let activeEffect;
 export function effect(fn, options: any = {}) {
   // fn依赖收集
   const _effect = new ReactiveEffect(fn, options.scheduler);
+  _effect.onStop = options.onStop;
   _effect.run();
+  const runner: any = _effect.run.bind(_effect); // 这里存在this指向 使用bind修改this指向
+  runner.effect = _effect;
+  return runner; 
+}
 
-  return _effect.run.bind(_effect); // 这里存在this指向 使用bind修改this指向
+export function stop(runner) {
+  runner.effect.stop();
 }

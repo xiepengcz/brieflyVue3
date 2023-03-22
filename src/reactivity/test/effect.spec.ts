@@ -1,4 +1,4 @@
-import { effect } from "../effect";
+import { effect, stop } from "../effect";
 import { reactive } from "../reactive";
 describe("effect", () => {
   it("happy path", () => {
@@ -61,5 +61,36 @@ describe("effect", () => {
     run();
     // should have run
     expect(dummy).toBe(2);
+  });
+  // 当执行了 stop 后，后续的副作用函数就不会执行了 除非再次执行 runner
+  it("stop", () => {
+    let dummy;
+    const obj = reactive({ prop: 1 });
+    const runner = effect(() => {
+      dummy = obj.prop;
+    });
+    obj.prop = 2;
+    expect(dummy).toBe(2);
+    stop(runner);
+    obj.prop = 3;
+    expect(dummy).toBe(2);
+    // stoped effect should still be manually callable
+    runner();
+
+    expect(dummy).toBe(3);
+  });
+  // 当执行了 stop 后，onStop会执行一次
+  it("onStop", () => {
+    const obj = reactive({ foo: 1 });
+    const onStop = jest.fn();
+    let dummy;
+    const runner = effect(
+      () => {
+        dummy = obj.foo;
+      },
+      { onStop }
+    );
+    stop(runner);
+    expect(onStop).toBeCalledTimes(1); // toBeCalledTimes表示被调用次数
   });
 });
