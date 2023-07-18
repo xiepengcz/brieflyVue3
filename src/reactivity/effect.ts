@@ -3,8 +3,8 @@ import { extend } from "../shared";
 class ReactiveEffect {
   private _fn: any;
   deps = [];
-  active = true;
-  onStop?: () => void;
+  active = true; // 判断是否已经清空过了
+  onStop?: () => void; // 当执行 stop 后 ，会执行一次 onStop
   constructor(fn, public scheduler?) {
     this._fn = fn;
   }
@@ -14,7 +14,8 @@ class ReactiveEffect {
   }
   stop() {
     if (this.active) {
-      cleanupEffect(this);
+      // 防止外部用户多次调用清空，如果多次调用，实际只清空一次
+      cleanupEffect(this); // 清除收集的依赖
       if (this.onStop) {
         this.onStop();
       }

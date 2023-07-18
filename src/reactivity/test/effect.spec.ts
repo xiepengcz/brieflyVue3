@@ -55,7 +55,7 @@ describe("effect", () => {
     expect(dummy).toBe(1);
     // should be called on first trigger
     obj.foo++;
-    expect(scheduler).toHaveBeenCalledTimes(1);
+    expect(scheduler).toHaveBeenCalledTimes(1); // 会被调用一次
     // should not run yet
     expect(dummy).toBe(1);
     // manually run
@@ -63,7 +63,8 @@ describe("effect", () => {
     // should have run
     expect(dummy).toBe(2);
   });
-  // 当执行了 stop 后，后续的副作用函数就不会执行了 除非再次执行 runner
+
+  // 当执行了 stop 后，后续的副作用函数就不会执行了，除非再次执行 runner
   it("stop", () => {
     let dummy;
     const obj = reactive({ prop: 1 });
@@ -75,7 +76,7 @@ describe("effect", () => {
     stop(runner);
     obj.prop = 3;
     expect(dummy).toBe(2);
-    // stoped effect should still be manually callable
+    // stopped effect should still be manually callable
     runner();
 
     expect(dummy).toBe(3);
