@@ -16,7 +16,7 @@ class ReactiveEffect {
     if (this.active) {
       // 防止外部用户多次调用清空，如果多次调用，实际只清空一次
       cleanupEffect(this); // 清除收集的依赖
-      if (this.onStop) {
+      if (this.onStop) { // 如果传入了 onStop, 就调用 onStop
         this.onStop();
       }
       this.active = false;
