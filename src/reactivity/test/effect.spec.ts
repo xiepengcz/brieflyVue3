@@ -35,7 +35,7 @@ describe("effect", () => {
 
   it("scheduler", () => {
     // scheduler:调度程序
-    // 1.通过 effect 第二个参数，给定一个 scheduler 的 fn 
+    // 1.通过 effect 第二个参数，给定一个 scheduler 的 fn
     // 2.effect 首次执行时，会执行 fn
     // 3.当响应式对象 set update 时，不会执行fn，而是执行 scheduler
     // 4.如果当执行 runner 时，会再次执行 fn
