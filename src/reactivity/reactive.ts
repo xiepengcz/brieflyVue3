@@ -15,10 +15,10 @@ export function readonly(raw) {
   return createActiveObject(raw, readonlyHandlers);
 }
 
-export function isReactive(value) {
+export function isReactive(value) { // 通过触发 get 操作来判断是否为 isReactive
   return !!value[ReactiveFlags.IS_REACTIVE];
 }
-export function isReadonly(value) {
+export function isReadonly(value) { // 通过触发 get 操作来判断是否为 isReadonly
   return !!value[ReactiveFlags.IS_READONLY];
 }
 

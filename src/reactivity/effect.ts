@@ -1,5 +1,8 @@
 import { extend } from "../shared";
 
+let activeEffect;
+let shouldTract;
+
 class ReactiveEffect {
   private _fn: any;
   deps = [];
@@ -9,14 +12,24 @@ class ReactiveEffect {
     this._fn = fn;
   }
   run() {
+    // 此时会收集依赖
+    if (!this.active) {
+      // stop状态下不收集依赖
+      return this._fn();
+    }
     activeEffect = this;
-    return this._fn();
+    shouldTract = true;
+    const result = this._fn();
+    // reset
+    shouldTract = false;
+    return result;
   }
   stop() {
     if (this.active) {
       // 防止外部用户多次调用清空，如果多次调用，实际只清空一次
       cleanupEffect(this); // 清除收集的依赖
-      if (this.onStop) { // 如果传入了 onStop, 就调用 onStop
+      if (this.onStop) {
+        // 如果传入了 onStop, 就调用 onStop
         this.onStop();
       }
       this.active = false;
@@ -27,10 +40,13 @@ function cleanupEffect(effect) {
   effect.deps.forEach((dep: any) => {
     dep.delete(effect);
   });
+  effect.deps.length = 0;
 }
 
 const targetMap = new Map();
 export function track(target, key) {
+  if (!isTracking()) return;
+
   // target -> key -> dep
   let depsMap = targetMap.get(target);
   if (!depsMap) {
@@ -44,9 +60,13 @@ export function track(target, key) {
     dep = new Set();
     depsMap.set(key, dep);
   }
-  if (!activeEffect) return;
+  if (dep.has(activeEffect)) return;
   dep.add(activeEffect);
   activeEffect.deps.push(dep);
+}
+
+function isTracking() {
+  return shouldTract && activeEffect !== undefined;
 }
 
 export function trigger(target, key) {
@@ -62,7 +82,6 @@ export function trigger(target, key) {
   }
 }
 
-let activeEffect;
 export function effect(fn, options: any = {}) {
   // fn依赖收集
   const _effect = new ReactiveEffect(fn, options.scheduler);
