@@ -1,4 +1,4 @@
-import { isReadonly, readonly } from "../reactive";
+import { isReadonly, readonly, isProxy } from "../reactive";
 describe("readonly", () => {
   // 被 readonly 的数据，不能被set,也就是只能读取，不能修改
   it("happy path", () => {
@@ -9,6 +9,7 @@ describe("readonly", () => {
     expect(isReadonly(wrapped.bar)).toBe(true);
     expect(isReadonly(original)).toBe(false);
     expect(isReadonly(original.bar)).toBe(false);
+    expect(isProxy(wrapped)).toBe(true);
     expect(wrapped.foo).toBe(1);
   });
 
