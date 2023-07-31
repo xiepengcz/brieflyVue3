@@ -1,4 +1,4 @@
-import { mutableHandlers, readonlyHandlers } from "./baseHandlers";
+import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from "./baseHandlers";
 
 export const enum ReactiveFlags {
   IS_REACTIVE = "__v_isReactive",
@@ -15,10 +15,16 @@ export function readonly(raw) {
   return createActiveObject(raw, readonlyHandlers);
 }
 
-export function isReactive(value) { // 通过触发 get 操作来判断是否为 isReactive
+export function shallowReadonly(raw) {
+  return createActiveObject(raw, shallowReadonlyHandlers);
+}
+
+export function isReactive(value) {
+  // 通过触发 get 操作来判断是否为 isReactive
   return !!value[ReactiveFlags.IS_REACTIVE];
 }
-export function isReadonly(value) { // 通过触发 get 操作来判断是否为 isReadonly
+export function isReadonly(value) {
+  // 通过触发 get 操作来判断是否为 isReadonly
   return !!value[ReactiveFlags.IS_READONLY];
 }
 
