@@ -5,6 +5,7 @@ import { reactive } from "./reactive";
 class RefImpl {
   private _value: any;
   private _rawValue: any;
+  private __v_isRef = true;
   public dep;
   constructor(value) {
     // 如果value 是一个对象，则转成 reactive
@@ -38,4 +39,12 @@ function trackRefValue(ref) {
 
 export function ref(value) {
   return new RefImpl(value);
+}
+
+export function isRef(ref) {
+  return !!ref.__v_isRef;
+}
+
+export function unRef(ref) {
+  return isRef(ref) ? ref.value : ref;
 }
