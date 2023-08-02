@@ -3,7 +3,7 @@ import { extend } from "../shared";
 let activeEffect;
 let shouldTract;
 
-class ReactiveEffect {
+export class ReactiveEffect {
   private _fn: any;
   deps = [];
   active = true; // 判断是否已经清空过了
