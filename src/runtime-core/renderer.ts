@@ -13,21 +13,13 @@ function patch(vnode: any, container: any) {
     processComponent(vnode, container);
   } else processElement(vnode, container);
 }
-function processComponent(vnode: any, container: any) {
-  mountComponent(vnode, container);
-}
 
-function mountComponent(vnode: any, container: any) {
-  const instance = createComponentInstance(vnode);
-  setupComponent(instance);
-  setupRenderEffect(instance, container);
-}
 function processElement(vnode: any, container: any) {
   mountElement(vnode, container);
 }
 
 function mountElement(vnode: any, container: any) {
-  const el = document.createElement(vnode.type);
+  const el = (vnode.el = document.createElement(vnode.type));
   // children 可以是string或者 array
   const { children, props } = vnode;
   if (typeof children === "string") {
@@ -47,11 +39,24 @@ function mountChildren(children: any[], container: any) {
   });
 }
 
-function setupRenderEffect(instance, container) {
+function processComponent(vnode: any, container: any) {
+  mountComponent(vnode, container);
+}
+
+function mountComponent(initialVNode: any, container: any) {
+  const instance = createComponentInstance(initialVNode);
+  setupComponent(instance);
+  setupRenderEffect(instance, initialVNode, container);
+}
+
+function setupRenderEffect(instance, initialVNode, container) {
   const { proxy } = instance;
 
   const subTree = instance.render.call(proxy);
   // vnode -> patch
   // 将vnode 变成 element  然后 mountElement
   patch(subTree, container);
+
+  // 所有的 element 都 mount 之后，再处理 $el
+  initialVNode.el = subTree.el;
 }
