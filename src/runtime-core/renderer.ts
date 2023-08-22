@@ -1,4 +1,4 @@
-import { isObject } from "../shared";
+import { isObject } from "../shared/index";
 import { createComponentInstance, setupComponent } from "./component";
 
 export function render(vnode, container) {
@@ -48,7 +48,9 @@ function mountChildren(children: any[], container: any) {
 }
 
 function setupRenderEffect(instance, container) {
-  const subTree = instance.render();
+  const { proxy } = instance;
+
+  const subTree = instance.render.call(proxy);
   // vnode -> patch
   // 将vnode 变成 element  然后 mountElement
   patch(subTree, container);
