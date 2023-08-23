@@ -1,19 +1,30 @@
-import { h } from '../../lib/guide-mini-vue.esm.js'
+import { h } from "../../lib/guide-mini-vue.esm.js";
 
-window.self = null
+window.self = null;
 export const App = {
   render() {
-    window.self = this
-    return h('div', { id: 'root', class: ['red', 'hard'] },
+    window.self = this;
+    return h(
+      "div",
+      {
+        id: "root",
+        class: ["red", "hard"],
+        onClick() {
+          console.log("click");
+        },
+        onMousedown() {
+          console.log("mousedown");
+        },
+      },
       // string
-      'hi,' + this.msg
+      "hi," + this.msg
       // array
       // [h('p', { class: 'red' }, 'hi '), h('p', { class: 'blue' }, this.msg)]
-    )
+    );
   },
   setup() {
     return {
-      msg: 'mini vue'
-    }
-  }
-}
+      msg: "mini vue",
+    };
+  },
+};
