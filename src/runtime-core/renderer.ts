@@ -1,6 +1,7 @@
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { isObject } from "../shared/index";
 import { createComponentInstance, setupComponent } from "./component";
+import { Fragment, Text } from "./vnode";
 
 export function render(vnode, container) {
   // 调用 patch 方法, 方便后续的递归操作
@@ -8,16 +9,37 @@ export function render(vnode, container) {
   patch(vnode, container);
 }
 function patch(vnode, container: any) {
-  const { shapeFlag } = vnode;
-  // 处理组件
-  // if (isObject(vnode.type)) {
-  if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-    processComponent(vnode, container);
-    // 判断vnode是否为 element
-    // } else if (typeof vnode.type === "string") {
-  } else if (shapeFlag & ShapeFlags.ELEMENT) {
-    processElement(vnode, container);
+  const { type, shapeFlag } = vnode;
+  // Fragment 只渲染 children
+  switch (type) {
+    case Fragment:
+      processFragment(vnode, container);
+      break;
+    case Text:
+      processText(vnode, container);
+      break;
+
+    default:
+      // 处理组件
+      // if (isObject(vnode.type)) {
+      if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
+        processComponent(vnode, container);
+        // 判断vnode是否为 element
+        // } else if (typeof vnode.type === "string") {
+      } else if (shapeFlag & ShapeFlags.ELEMENT) {
+        processElement(vnode, container);
+      }
+      break;
   }
+}
+
+function processFragment(vnode: any, container: any) {
+  mountChildren(vnode, container);
+}
+function processText(vnode: any, container: any) {
+  const { children } = vnode;
+  const textNode = (vnode.el = document.createTextNode(children));
+  container.append(textNode);
 }
 
 function processElement(vnode: any, container: any) {
@@ -33,13 +55,14 @@ function mountElement(vnode: any, container: any) {
     el.textContent = children;
     // } else if (Array.isArray(children)) {
   } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
-    mountChildren(children, el);
+    mountChildren(vnode, el);
   }
   // 处理props
   for (const key in props) {
     const val = props[key];
     const isOn = (key: string) => /^on[A-Z]/.test(key);
-    if (isOn(key)) { // 注册事件
+    if (isOn(key)) {
+      // 注册事件
       const event = key.slice(2).toLowerCase();
       el.addEventListener(event, val);
     } else {
@@ -48,8 +71,8 @@ function mountElement(vnode: any, container: any) {
   }
   container.append(el);
 }
-function mountChildren(children: any[], container: any) {
-  children.forEach((v) => {
+function mountChildren(vnode, container: any) {
+  vnode.children.forEach((v) => {
     patch(v, container);
   });
 }
