@@ -1,4 +1,5 @@
 import { effect } from "../reactivity/effect";
+import { EMPTY_OBJ } from "../shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createComponentInstance, setupComponent } from "./component";
 import { createAppAPI } from "./createApp";
@@ -63,6 +64,32 @@ export function createRenderer(options) {
     console.log("patchElement");
     console.log("n1", n1);
     console.log("n2", n2);
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+    const el = (n2.el = n1.el);
+    patchProps(el, oldProps, newProps);
+  }
+
+  function patchProps(el, oldProps, newProps) {
+    if (oldProps !== newProps) {
+      for (const key in newProps) {
+        const prevProp = oldProps[key];
+        const nextProp = newProps[key];
+        if (prevProp !== nextProp) {
+          // 如果不一致 则触发更新
+          hostPatchProp(el, key, prevProp, nextProp);
+        }
+      }
+
+      // 当新值的属性不存在了 就删除
+      if (oldProps !== EMPTY_OBJ) {
+        for (const key in oldProps) {
+          if (!(key in newProps)) {
+            hostPatchProp(el, key, oldProps, null);
+          }
+        }
+      }
+    }
   }
 
   function mountElement(vnode: any, container: any, parentComponent) {
@@ -87,7 +114,7 @@ export function createRenderer(options) {
       // } else {
       //   el.setAttribute(key, val);
       // }
-      hostPatchProp(el, key, val);
+      hostPatchProp(el, key, null, val);
     }
     // container.append(el);
     hostInsert(el, container);
@@ -130,8 +157,6 @@ export function createRenderer(options) {
         const subTree = instance.render.call(proxy);
         const prevSubTree = instance.subTree;
         instance.subTree = subTree;
-        console.log("subtree", subTree);
-        console.log("prevSubTree", prevSubTree);
         patch(prevSubTree, subTree, container, instance);
       }
     });
