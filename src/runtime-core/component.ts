@@ -5,7 +5,6 @@ import { emit } from "./componentEmit";
 import { initSlots } from "./componentSlots";
 
 export function createComponentInstance(vnode: any, parent) {
-  console.log("createComponentInstance", parent);
   const component = {
     vnode,
     type: vnode.type,
