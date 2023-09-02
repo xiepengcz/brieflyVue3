@@ -3,6 +3,7 @@ import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { shallowReadonly } from "../reactivity/reactive";
 import { emit } from "./componentEmit";
 import { initSlots } from "./componentSlots";
+import { proxyRefs } from "../reactivity/ref";
 
 export function createComponentInstance(vnode: any, parent) {
   const component = {
@@ -13,6 +14,8 @@ export function createComponentInstance(vnode: any, parent) {
     slots: {},
     provides: parent ? parent.provides : {},
     parent,
+    isMounted: false,
+    subTree: {},
     emit: () => {},
   };
   component.emit = emit.bind(null, component) as any;
@@ -46,7 +49,7 @@ function setupStatefulComponent(instance: any) {
 function handleSetupResult(setupResult: any, instance: any) {
   // TODO 后续实现 function
   if (typeof setupResult === "object") {
-    instance.setupState = setupResult;
+    instance.setupState = proxyRefs(setupResult);
   }
   // 保证组件的render一定是有值的
   finishComponentSetup(instance);
