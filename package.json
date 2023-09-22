@@ -19,6 +19,7 @@
     "@rollup/plugin-typescript": "^11.1.2",
     "@types/jest": "^28.1.1",
     "babel-jest": "^28.1.1",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.26.2",
     "jest": "^28.1.1",
     "rollup": "^3.28.0",
     "tslib": "^2.6.1",

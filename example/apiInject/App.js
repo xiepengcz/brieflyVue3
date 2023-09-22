@@ -35,6 +35,7 @@ const Consumer = {
     return h("div", {}, `Consumer: - ${this.foo} - ${this.bar} - ${this.baz}`);
   },
 };
+
 export const App = {
   name: "App",
   render() {
