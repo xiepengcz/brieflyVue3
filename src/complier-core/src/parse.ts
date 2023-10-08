@@ -1,4 +1,5 @@
 import { NodeTypes } from "./ast";
+import { Text } from "../../runtime-core/vnode";
 
 const enum TagType {
   Start,
@@ -20,8 +21,26 @@ function parseChildren(context) {
       node = parseElement(context);
     }
   }
+  if (!node) {
+    node = parseText(context);
+  }
   nodes.push(node);
   return nodes;
+}
+
+function parseText(context: any) {
+  // 1获取content
+  const content = parseTextData(context, context.source.length);
+  return {
+    type: NodeTypes.TEXT,
+    content: content,
+  };
+}
+function parseTextData(context: any, length: number) {
+  const content = context.source.slice(0, length);
+  // 2推进
+  advanceBy(context, length);
+  return content;
 }
 
 function parseElement(context: any) {
@@ -30,7 +49,6 @@ function parseElement(context: any) {
   const element = parseTag(context, TagType.Start);
 
   parseTag(context, TagType.End);
-  console.log("--", context.source);
   return element;
 }
 function parseTag(context: any, type: TagType) {
@@ -60,9 +78,9 @@ function parseInterpolation(context) {
 
   const rawContentLength = closeIndex - openDelimiter.length;
 
-  const rawContent = context.source.slice(0, rawContentLength);
+  const rawContent = parseTextData(context, rawContentLength);
   const content = rawContent.trim();
-  advanceBy(context, rawContentLength + closeDelimiter.length);
+  advanceBy(context, closeDelimiter.length);
 
   return {
     type: NodeTypes.INTERPOLATION,
