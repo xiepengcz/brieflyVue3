@@ -10,4 +10,11 @@ describe("codegen", () => {
     // 快照测试
     expect(code).toMatchSnapshot();
   });
+  it("interpolation", () => {
+    const ast = baseParse("{{message}}");
+    transform(ast)
+    const { code } = generate(ast);
+    // 快照测试
+    expect(code).toMatchSnapshot();
+  });
 });

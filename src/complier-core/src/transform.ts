@@ -1,3 +1,5 @@
+import { NodeTypes } from "./ast";
+
 export function transform(root, options = {}) {
   const context = createTransformContext(root, options);
   // 1.遍历 深度优先搜索
@@ -6,6 +8,8 @@ export function transform(root, options = {}) {
 
   // 代码生成
   createRootCodegen(root);
+
+  root.helpers = [...context.helpers.keys()];
 }
 
 function createRootCodegen(root: any) {
@@ -16,6 +20,10 @@ function createTransformContext(root, options) {
   const context = {
     root,
     nodeTransforms: options.nodeTransforms || [],
+    helpers: new Map(),
+    helper(key) {
+      context.helpers.set(key, 1)
+    }
   };
   return context;
 }
@@ -28,6 +36,16 @@ function traverseNode(node, context) {
     const transform = nodeTransforms[i];
     transform(node);
   }
+  switch (node.type) {
+    case NodeTypes.INTERPOLATION:
+      context.helper('toDisplayString')
+      break;
+  
+    default:
+      break;
+  }
+
+
   traverseChildren(node, context);
 }
 function traverseChildren(node: any, context: any) {
