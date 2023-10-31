@@ -16,7 +16,6 @@ describe("computed", () => {
       foo: 1,
     });
     const getter = jest.fn(() => {
-      console.log('90909090')
       return value.foo;
     });
     const cValue = computed(getter);
